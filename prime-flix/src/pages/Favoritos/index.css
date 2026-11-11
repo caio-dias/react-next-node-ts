@@ -1,0 +1,61 @@
+.Favoritos {
+  margin-top: 20px;
+}
+
+.Favoritos h1 {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.Favoritos h2 {
+  margin-bottom: 14px;
+  height: 60px;
+}
+
+.Favoritos img {
+  width: 200px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  object-fit: cover;
+  height: auto;
+}
+
+.Favoritos p {
+  margin-bottom: 14px;
+}
+
+.Favoritos ul {
+  min-width: 880px;
+  display: flex;
+}
+
+.Favoritos ul li {
+  width: 200px;
+  margin-right: 20px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.Favoritos a {
+  text-decoration: none;
+  color: #116feb;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+.Favoritos button {
+  margin-top: 10px;
+  border-radius: 8px;
+  padding: 12px;
+  outline: none;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}

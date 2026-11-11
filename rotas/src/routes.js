@@ -6,6 +6,8 @@ import Contato from "./pages/Contato"
 import NotFound from "./pages/NotFound"
 import Produto from "./pages/Produto"
 
+// npm install react-router-dom < instalar para usar rotas no react
+
 function RoutesApp() {
   return (
     <BrowserRouter>
