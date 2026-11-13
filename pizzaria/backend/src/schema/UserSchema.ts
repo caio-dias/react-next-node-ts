@@ -3,12 +3,21 @@ import { z } from "zod"
 export const createUserSchema = z.object({
   body: z.object({
     name: z
-      .string({message: 'o nome precisa ser um texto'})
-      .min(3, {message: 'o nome precisa ter no minimo 3 caracteres'}),
+      .string({message: 'O nome precisa ser um texto!'})
+      .min(3, {message: 'O nome precisa ter no minimo 3 caracteres!'}),
     email: z
-      .email({message: 'o email precisa ser valido'}),
+      .email({message: 'O email precisa ser valido!'}),
     password: z
       .string()
-      .min(6, {message: 'o nome precisa ter no minimo 6 caracteres'}),
+      .min(6, {message: 'O nome precisa ter no minimo 6 caracteres!'}),
+  })
+})
+
+export const authUserSchema = z.object({
+  body: z.object({
+    email: z
+      .email({ message: 'O email precisa ser valido!' }),
+    password: z
+      .string({ message: 'A senha é obrigatoria!' })
   })
 })
