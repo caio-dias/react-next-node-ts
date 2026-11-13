@@ -8,9 +8,11 @@ import { CreateCategoryController } from './controllers/category/CreateCategoryC
 // middlewares
 import { validateSchema } from './middlewares/ValidateSchema'
 import { checkAuthenticate } from './middlewares/CheckAuthenticate'
+import { isAdmin } from './middlewares/isAdmin'
 
 // schemas
 import { createUserSchema, authUserSchema } from './schema/UserSchema'
+import { createCategorySchema } from './schema/CategorySchema'
 
 const router = Router()
 
@@ -24,6 +26,10 @@ router.post('/session', validateSchema(authUserSchema), new AuthUserController()
 router.get('/me', checkAuthenticate, new DetailUserController().handleDetailUser)
 
 // categoria
-router.post('/category', checkAuthenticate, new CreateCategoryController().handleCategory)
+router.post('/category', 
+  validateSchema(createCategorySchema),
+  checkAuthenticate, isAdmin,
+  new CreateCategoryController().handleCategory,
+)
 
 export { router }
