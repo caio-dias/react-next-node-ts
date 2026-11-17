@@ -27,6 +27,7 @@ O backend da pizzaria já possui as seguintes funcionalidades implementadas e em
 
 - Cadastro e autenticação de usuários com senha criptografada via `bcryptjs`
 - Recuperação de dados do usuário autenticado via `GET /me`
+- Criação de pedidos por usuários autenticados
 - Listagem e criação de categorias, com controle de acesso por perfil `ADMIN`
 - Cadastro de produtos com upload de imagem, incluindo validação do arquivo e envio para Cloudinary
 - Proteção de rotas via JWT (`CheckAuthenticate`) e verificação de privilégios (`isAdmin`)
@@ -112,8 +113,13 @@ backend/
 │   │   ├── category/
 │   │   │   ├── CreateCategoryController.ts
 │   │   │   └── ListCategoriesController.ts
+│   │   ├── order/
+│   │   │   ├── CreateOrderController.ts
+│   │   │   ├── DeleteItemOrderController.ts
+│   │   │   └── OrderDetailController.ts
 │   │   ├── product/
-│   │   │   └── CreateProductController.ts
+│   │   │   ├── CreateProductController.ts
+│   │   │   └── ListCategoryProductsController.ts
 │   │   └── user/
 │   │       ├── AuthUserController.ts
 │   │       ├── CreateUserController.ts
@@ -126,14 +132,20 @@ backend/
 │   │   └── index.ts
 │   ├── schema/
 │   │   ├── CategorySchema.ts
+│   │   ├── OrderSchema.ts
 │   │   ├── ProductSchema.ts
 │   │   └── UserSchema.ts
 │   ├── services/
 │   │   ├── category/
 │   │   │   ├── CreateCategoryService.ts
 │   │   │   └── ListCategoriesService.ts
+│   │   ├── order/
+│   │   │   ├── CreateOrderService.ts
+│   │   │   ├── DeleteItemOrderService.ts
+│   │   │   └── OrderDetailService.ts
 │   │   ├── product/
-│   │   │   └── CreateProductService.ts
+│   │   │   ├── CreateProductService.ts
+│   │   │   └── ListCategoryProductsService.ts
 │   │   └── user/
 │   │       ├── AuthUserService.ts
 │   │       ├── CreateUserService.ts
@@ -416,6 +428,45 @@ Valida criação de categorias:
 
 - Nome inválido: "Nome da categoria precisa ter 2 caracteres"
 
+### Order Schema (`schema/OrderSchema.ts`)
+
+#### **createOrderSchema**
+
+Valida a criação de pedidos:
+
+```typescript
+{
+  body: {
+    table: number (inteiro positivo),
+    name: string (obrigatório)
+  }
+}
+```
+
+#### **removeItemOrderSchema**
+
+Valida a remoção de itens do pedido:
+
+```typescript
+{
+  query: {
+    item_id: string (obrigatório)
+  }
+}
+```
+
+#### **orderDetailSchema**
+
+Valida a consulta dos detalhes de um pedido:
+
+```typescript
+{
+  query: {
+    order_id: string (obrigatório)
+  }
+}
+```
+
 ---
 
 ## 🌐 Endpoints
@@ -552,12 +603,90 @@ Cria um novo produto com imagem.
 - O campo `price` é enviado como texto no formulário e convertido para `int` no serviço de criação do produto.
 - O arquivo da imagem é obrigatório para essa rota.
 
+#### **GET /category/product**
+
+Lista todos os produtos de uma categoria.
+
+**Middlewares**: `checkAuthenticate`, `validateSchema(listCategoryProductsSchema)`
+
+**Query param obrigatório**:
+
+```text
+category_id=<id da categoria>
+```
+
+**Resultado**:
+
+- Retorna os produtos associados à categoria informada, incluindo os dados básicos da categoria
+- Requer autenticação, sem exigir perfil `ADMIN`
+
+---
+
+### **Pedidos**
+
+#### **POST /order**
+
+Cria um novo pedido.
+
+**Middlewares**: `checkAuthenticate`, `validateSchema(createOrderSchema)`
+
+**Body**:
+
+```json
+{
+  "table": 1,
+  "name": "João Silva"
+}
+```
+
+**Resultado**:
+
+- Cria o pedido com os dados da mesa e do cliente
+- Requer autenticação, sem exigir perfil `ADMIN`
+
+#### **GET /order/detail**
+
+Consulta os detalhes de um pedido e seus itens.
+
+**Middlewares**: `checkAuthenticate`, `validateSchema(orderDetailSchema)`
+
+**Query param obrigatório**:
+
+```text
+order_id=<id do pedido>
+```
+
+**Resultado**:
+
+- Verifica se o pedido existe antes de consultar os itens associados
+- Retorna os dados do pedido e seus itens, incluindo os dados básicos de cada produto, ou `404` se o pedido não existir
+- Requer autenticação, sem exigir perfil `ADMIN`
+
+#### **DELETE /order/remove**
+
+Remove um item de um pedido.
+
+**Middlewares**: `checkAuthenticate`, `validateSchema(removeItemOrderSchema)`
+
+**Query param obrigatório**:
+
+```text
+item_id=<id do item>
+```
+
+**Resultado**:
+
+- Verifica se o item existe e o remove da tabela `items`
+- Retorna os dados básicos do item removido ou `404` se ele não existir
+- Requer autenticação, sem exigir perfil `ADMIN`
+
 ---
 
 ### **Resumo das regras de acesso**
 
 - `POST /users` e `POST /session` são públicas
-- `GET /me` e `GET /category` exigem autenticação
+- `GET /me`, `GET /category`, `GET /category/product` e `GET /order/detail` exigem autenticação
+- `POST /order` e `DELETE /order/remove` exigem autenticação, sem exigir perfil `ADMIN`
 - `POST /category` e `POST /product` exigem autenticação + perfil `ADMIN`
 
 ---

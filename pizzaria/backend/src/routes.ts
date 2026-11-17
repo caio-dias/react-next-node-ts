@@ -12,7 +12,16 @@ import { CreateCategoryController } from './controllers/category/CreateCategoryC
 import { ListCategoriesController } from './controllers/category/ListCategoriesController'
 import { CreateProductController } from './controllers/product/CreateProductController'
 import { ListProductsController } from './controllers/product/ListProductsController'
+import { ListCategoryProductsController } from './controllers/product/ListCategoryProductsController'
 import { DeleteProductController } from './controllers/product/DeleteProductsController'
+import { CreateOrderController } from './controllers/order/CreateOrderController'
+import { ListOrdersController } from './controllers/order/ListOrdersController'
+import { AddItemOrderController } from './controllers/order/AddItemOrderController'
+import { DeleteItemOrderController } from './controllers/order/DeleteItemOrderController'
+import { OrderDetailController } from './controllers/order/OrderDetailController'
+import { SendOrderController } from './controllers/order/SendOrderController'
+import { FinishOrderController } from './controllers/order/FinishOrderController'
+import { DeleteOrderController } from './controllers/order/DeleteOrderController'
 
 // middlewares
 import { validateSchema } from './middlewares/ValidateSchema'
@@ -22,7 +31,15 @@ import { isAdmin } from './middlewares/isAdmin'
 // schemas
 import { createUserSchema, authUserSchema } from './schema/UserSchema'
 import { createCategorySchema } from './schema/CategorySchema'
-import { createProductSchema } from './schema/ProductSchema'
+import { createProductSchema, listCategoryProductsSchema } from './schema/ProductSchema'
+import {
+  createOrderSchema,
+  addItemOrderSchema,
+  removeItemOrderSchema,
+  orderDetailSchema,
+  sendOrderSchema,
+  deleteOrderSchema,
+} from './schema/OrderSchema'
 
 const router = Router()
 const upload = multer(uploadConfig)
@@ -48,6 +65,12 @@ router.post('/category',
 // produto
 router.get('/products', checkAuthenticate, new ListProductsController().handleListProducts)
 
+router.get('/category/product',
+  checkAuthenticate,
+  validateSchema(listCategoryProductsSchema),
+  new ListCategoryProductsController().handleListCategoryProducts,
+)
+
 router.post('/product',
   checkAuthenticate,
   isAdmin,
@@ -57,5 +80,58 @@ router.post('/product',
 )
 
 router.delete('/product', checkAuthenticate, isAdmin, new DeleteProductController().handleDeleteProduct)
+
+// pedido
+router.post('/order',
+  checkAuthenticate,
+  validateSchema(createOrderSchema),
+  new CreateOrderController().handleCreateOrder,
+)
+
+router.get('/orders',
+  checkAuthenticate,
+  new ListOrdersController().handleListOrders,
+)
+
+router.get('/order/detail',
+  checkAuthenticate,
+  validateSchema(orderDetailSchema),
+  new OrderDetailController().handleOrderDetail,
+)
+
+// adicionar item ao pedido
+router.post('/order/add',
+  checkAuthenticate,
+  validateSchema(addItemOrderSchema),
+  new AddItemOrderController().handleAddItemOrder,
+)
+
+// remover item do pedido
+router.delete('/order/remove',
+  checkAuthenticate,
+  validateSchema(removeItemOrderSchema),
+  new DeleteItemOrderController().handleDeleteItemOrder,
+)
+
+// envia pedido para produção
+router.put('/order/send',
+  checkAuthenticate,
+  validateSchema(sendOrderSchema),
+  new SendOrderController().handleSendOrder,
+)
+
+// finaliza pedido
+router.put('/order/finish',
+  checkAuthenticate,
+  validateSchema(sendOrderSchema),
+  new FinishOrderController().handleFinishOrder,
+)
+
+// deleta pedido
+router.delete('/order/delete',
+  checkAuthenticate,
+  validateSchema(deleteOrderSchema),
+  new DeleteOrderController().handleDeleteOrder,
+)
 
 export { router }

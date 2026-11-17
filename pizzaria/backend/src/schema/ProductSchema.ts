@@ -10,3 +10,11 @@ export const createProductSchema = z.object({
     category_id: z.string({ message: "A Categoria do produto é obrigatória" }),
   }),
 });
+
+export const listCategoryProductsQuerySchema = z.object({
+  category_id: z.string().min(1, { message: "A categoria é obrigatória" }),
+})
+
+export const listCategoryProductsSchema = z.object({
+  query: listCategoryProductsQuerySchema,
+})
