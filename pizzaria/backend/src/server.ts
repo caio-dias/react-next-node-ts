@@ -14,7 +14,7 @@ app.use(cors())
 app.use(router)
 
 // tratativas de erros
-app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
+app.use((error: Error, _req: Request, res: Response, _next: NextFunction) => {
   if (error instanceof Error) {
     return res.status(400).json({
       error: error.message,
